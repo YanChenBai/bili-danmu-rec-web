@@ -1,6 +1,6 @@
 <template>
     <n-grid clos="12" x-gap="10" y-gap="10">
-        <n-gi v-for="item in data" span="4">
+        <n-gi v-for="item in data" span="3">
             <n-card hoverable class="card" @click="goto(item.longId)">
                 <img class="img" :src="`https://images.weserv.nl/?url=${item.face}`">
                 <div><n-h3 style="margin-bottom: 0;">{{ item.name }}</n-h3></div>

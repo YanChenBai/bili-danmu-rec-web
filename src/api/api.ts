@@ -11,7 +11,7 @@ Axios.defaults.baseURL = 'http://localhost:3000';
 export interface Respons<T = any> {
   code: number;
   message?: string;
-  data: T | null;
+  data: T;
 }
 function Api<T = any>(config: Config): Promise<Respons<T> | false> {
   return new Promise(async (resolve, rejects) => {
