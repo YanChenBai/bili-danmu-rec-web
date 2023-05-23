@@ -5,7 +5,14 @@ export const getUserList = (): AxiosRequestConfig => ({
   url: '/info/userList',
 });
 
-export const getDanmu = (id: number, page: number): AxiosRequestConfig => ({
+interface GetDanmuParams {
+  id: number;
+  page: number;
+  uname?: string;
+  msg?: string;
+}
+export const getDanmu = (params: GetDanmuParams): AxiosRequestConfig => ({
   method: 'GET',
-  url: `/danmu/list?id=${id}&page=${page}`,
+  url: `/danmu/list`,
+  params,
 });

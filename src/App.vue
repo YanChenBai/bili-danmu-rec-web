@@ -2,21 +2,30 @@
     <n-config-provider abstract :theme="darkTheme">
         <n-layout>
             <n-layout-header bordered>
-                <div class="nav">Index</div>
+                <div class="nav">
+                    <n-menu mode="horizontal" :options="menuOptions" />
+                </div>
             </n-layout-header>
-            <n-layout-content class="background">
-                <n-scrollbar style="height: calc(100vh - 62px);">
-                    <div class="wrap">
-                        <RouterView></RouterView>
-                    </div>
-                </n-scrollbar>
+            <n-layout-content class="content">
+                <RouterView></RouterView>
+                <div class="background"></div>
             </n-layout-content>
         </n-layout>
     </n-config-provider>
+    <div class="background"></div>
 </template>
 <script setup lang="ts">
-import { RouterView } from 'vue-router';
-import { darkTheme } from 'naive-ui';
+import { RouterLink, RouterView } from 'vue-router';
+import { MenuOption, darkTheme } from 'naive-ui';
+import { h } from 'vue';
+const menuOptions: MenuOption[] = [
+    {
+        label: () => h(RouterLink, { to: '/' },
+            { default: () => '主页' }
+        ),
+        key: 'index'
+    }
+]
 </script>
 
 <style scoped lang="scss">
@@ -24,17 +33,21 @@ import { darkTheme } from 'naive-ui';
     width: 1100px;
     margin: 0 auto;
     height: 60px;
+    display: flex;
+    align-items: center;
 }
 
-.wrap {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 10px;
-    box-sizing: border-box;
-}
-
-.background {
+.content {
     width: 100vw;
-    // background-color: rgb(250, 250, 250);
+    height: calc(100vh - 61px);
+    overflow: hidden;
+    filter:alpha(opacity=60);
+    background: url('@/assets/background2.png');
+}
+</style>
+<style>
+a {
+    text-decoration: none;
+    color: unset;
 }
 </style>

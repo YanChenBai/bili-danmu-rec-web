@@ -1,38 +1,56 @@
 <template>
-    <div>
+    <Wrap>
+        <n-form inline>
+            <n-form-item :show-label="false"><n-input style="width: 200px;" placeholder="搜索用户名"
+                    v-model:value="search.uname" /></n-form-item>
+            <n-form-item :show-label="false"><n-input style="width: 200px;" placeholder="搜索弹幕"
+                    v-model:value="search.msg" /></n-form-item>
+            <n-form-item :show-label="false">
+                <n-button type="primary" @click="getData(1)">搜索</n-button>
+            </n-form-item>
+        </n-form>
+        <n-text type="primary">Tips： 当前显示的粉丝牌为发弹幕时所佩戴的</n-text>
         <div v-for="item in data" class="msg-card">
             <div class="top">
-                <a :href="`https://live.bilibili.com/${item.badge.anchor.room_id}`" target="_blank" class="badge"
-                    :style="{ background: item.badge.color }" v-if="item.badge">
-                    <div class="uname">{{ item.badge.name }}</div>
-                    <div class="level" :style="{ color: item.badge.color }">{{ item.badge.level }}</div>
-                </a>
-                <div class="roomAdmin" v-if="item.identityInfo.room_admin">房管</div>
-                <div class="guard" v-if="item.identityInfo && item.identityInfo.guard_level !== 0">
-                    <div v-if="item.identityInfo.guard_level === 3">
-                        <img width="30" height="20" src="@/assets/jz.png">
-                    </div>
-                    <div v-else-if="item.identityInfo.guard_level === 2">
-                        <img width="30" height="20" src="@/assets/td.png">
-                    </div>
-                    <div v-else>
-                        <img width="30" height="20" src="@/assets/zd.png">
+                <div class="left">
+                    <Badge class="top-item" v-if="item.badge !== null" :badge="item.badge"></Badge>
+                    <template class="top-item" v-if="item.identityInfo !== null">
+                        <RoomAdmin class="top-item" :is="item.identityInfo.room_admin"
+                            v-if="item.identityInfo.room_admin" />
+                        <Guard class="top-item" :level="item.identityInfo.guard_level"
+                            v-if="item.identityInfo.guard_level !== 0"></Guard>
+                    </template>
+                    <div class="uname">
+                        <n-tooltip trigger="hover">
+                            <template #trigger>
+                                <a :href="`https://space.bilibili.com/${item.uid}`" target="_blank">{{ item.uname }}</a>
+                            </template>
+                            点击去到他/她/它的主页
+                        </n-tooltip>
                     </div>
                 </div>
-                <div style="margin-left: 10px;">{{ item.uname }}</div>
+                <div>
+                    {{ transformDate(item.receiveTime) }}
+                </div>
             </div>
             <div class="msg">{{ item.msg }}</div>
         </div>
-    </div>
-    <div class="more"><n-button style="width: 200px;" type="primary" @click="getData(pagination.page++)">加载更多 ({{ pagination.page }} / {{ pagination.pageCount
-    }})</n-button></div>
+        <div class="page">
+            <n-pagination v-model:page="pagination.page" :page-count="pagination.pageCount" @update:page="updatePage" />
+        </div>
+    </Wrap>
 </template>
 <script setup lang="ts">
+import Wrap from '@/components/wrap.vue';
 import { useRoute } from 'vue-router';
 import { getDanmu } from '@/api/info';
 import Api from '@/api/api';
-import { GuardLevel } from 'blive-message-listener'
+import Badge from '@/components/badge.vue';
+import RoomAdmin from '@/components/roomAdmin.vue';
+import Guard from '@/components/guard.vue';
 import { reactive, ref } from 'vue';
+import { Msg } from '@/types/danmu.type';
+import moment from 'moment';
 defineOptions({
     name: "Danmu"
 });
@@ -42,61 +60,52 @@ const data = ref<Msg[]>([]);
 const pagination = reactive({
     page: 1,
     pageSize: 100,
-    pageCount: 0
+    pageCount: 0,
+    count: 0
 })
+const search = reactive({
+    uname: '',
+    msg: '',
+});
 
-interface MsgStr {
-    id: number,
-    msg: string,
-    roomId: string,
-    uid: string,
-    uname: string,
-    createTime: string,
-    receiveTime: string,
-    messageId: string,
-    badge: string,
-    identityInfo: string
-}
+// const time = ref([moment().subtract(1, 'months').valueOf(), Date.now()])
 
-type Msg = MsgStr & {
-    badge: {
-        active: boolean,
-        name: string,
-        level: number,
-        color: string,
-        anchor: {
-            room_id: number,
-            uid: number
-        }
-    },
-    identityInfo: {
-        /** 直播榜单排名 */
-        rank: 0 | 1 | 2 | 3
-        /** 大航海信息 */
-        guard_level: GuardLevel
-        /** 房管 */
-        room_admin: boolean
+function check(data: any) {
+    if (typeof data === "string") {
+        return JSON.parse(data);
     }
+    return data;
 }
+
 function getData(page = 1) {
+    console.log({ id, page, uname: search.uname, msg: search.msg });
+
     Api<{
-        results: MsgStr[],
+        results: any[],
         page: number,
         count: number
-    }>(getDanmu(id, page)).then(res => {
+    }>(getDanmu({ id, page, uname: search.uname, msg: search.msg })).then(res => {
         if (res === false) return;
-        const results: Msg[] = res.data.results.map(item => ({ ...item, badge: JSON.parse(item.badge), identityInfo: JSON.parse(item.identityInfo) }))
-        data.value = [...data.value, ...results];
+        const results: Msg[] = res.data.results.map(item => ({ ...item, badge: check(item.badge), identityInfo: check(item.identityInfo) }))
+        data.value = results;
         console.log(Math.floor(res.data.count / 100));
         pagination.pageCount = Math.floor(res.data.count / 100);
+        pagination.count = res.data.count;
     })
 }
+
+const updatePage = (page: number) => getData(page)
+
+function transformDate(str: string) {
+    return moment(str, "YYYY-MM-DDTHH:mm:ss").format("YYYY/MM/DD HH:mm:ss")
+}
+
 getData()
 </script>
 
 <style scoped lang="scss">
 .msg-card {
-    margin-top: 10px;
+    margin-bottom: 10px;
     overflow: hidden;
     border-radius: 4px;
     background: rgba(200, 200, 200, 0.1);
@@ -117,50 +126,22 @@ getData()
 .top {
     display: flex;
     align-items: center;
+    justify-content: space-between;
 }
 
-.badge {
-    text-decoration: none;
-    color: unset;
-    border-radius: 2px;
-    font-size: 14px;
+.left {
     display: flex;
-    align-items: center;
-    overflow: hidden;
-    text-align: center;
-    height: 20px;
-    user-select: none;
-    cursor: pointer;
 
-    .uname {
-        width: 50px;
-    }
-
-    .level {
-        width: 20px;
-        background-color: #fff;
-        padding: 0 3px;
+    .top-item {
+        margin-right: 6px;
     }
 }
 
-.guard {
-    height: 20px;
-    margin-left: 10px;
-}
-
-.roomAdmin {
-    height: 20px;
+.uname {
     padding: 0 4px;
-    border-radius: 2px;
-    margin-left: 10px;
-    background: rgb(255, 136, 0);
 }
 
-.more {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    margin-top: 10px;
-    margin-bottom: 300px;
+.page {
+    margin-bottom: 400px;
 }
 </style>
