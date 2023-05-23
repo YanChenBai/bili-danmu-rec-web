@@ -36,7 +36,7 @@ import type {
 declare module 'vue-router/auto/routes' {
   export interface RouteNamedMap {
     '/': RouteRecordInfo<'/', '/', Record<never, never>, Record<never, never>>,
-    '/danmu/[id]': RouteRecordInfo<'/danmu/[id]', '/danmu/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
+    '/danmu/[roomId]': RouteRecordInfo<'/danmu/[roomId]', '/danmu/:roomId', { roomId: ParamValue<true> }, { roomId: ParamValue<false> }>,
   }
 }
 

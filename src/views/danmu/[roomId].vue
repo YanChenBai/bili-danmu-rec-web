@@ -1,10 +1,15 @@
 <template>
     <Wrap>
         <n-form inline>
-            <n-form-item :show-label="false"><n-input style="width: 200px;" placeholder="搜索用户名"
-                    v-model:value="search.uname" /></n-form-item>
-            <n-form-item :show-label="false"><n-input style="width: 200px;" placeholder="搜索弹幕"
-                    v-model:value="search.msg" /></n-form-item>
+            <n-form-item :show-label="false">
+                <n-input style="width: 200px;" placeholder="搜索用户名" v-model:value="search.uname" />
+            </n-form-item>
+            <n-form-item :show-label="false">
+                <n-input style="width: 200px;" placeholder="搜索弹幕" v-model:value="search.msg" />
+            </n-form-item>
+            <n-form-item :show-label="false">
+                <n-date-picker v-model:value="range" type="datetimerange" clearable />
+            </n-form-item>
             <n-form-item :show-label="false">
                 <n-button type="primary" @click="getData(1)">搜索</n-button>
             </n-form-item>
@@ -43,19 +48,20 @@
 <script setup lang="ts">
 import Wrap from '@/components/wrap.vue';
 import { useRoute } from 'vue-router';
-import { getDanmu } from '@/api/info';
+import { queryDanmu, QueryDanmuParams } from '@/api/info';
 import Api from '@/api/api';
 import Badge from '@/components/badge.vue';
 import RoomAdmin from '@/components/roomAdmin.vue';
 import Guard from '@/components/guard.vue';
 import { reactive, ref } from 'vue';
 import { Msg } from '@/types/danmu.type';
+import { filterEmptyKey } from '@/utils/transformer';
 import moment from 'moment';
 defineOptions({
     name: "Danmu"
 });
 const route = useRoute();
-const id = Number(route.params.id);
+const roomId = Number(route.params.roomId);
 const data = ref<Msg[]>([]);
 const pagination = reactive({
     page: 1,
@@ -68,29 +74,27 @@ const search = reactive({
     msg: '',
 });
 
-// const time = ref([moment().subtract(1, 'months').valueOf(), Date.now()])
-
-function check(data: any) {
-    if (typeof data === "string") {
-        return JSON.parse(data);
-    }
-    return data;
-}
+const range = ref([moment().subtract(1, 'months').valueOf(), Date.now()])
 
 function getData(page = 1) {
-    console.log({ id, page, uname: search.uname, msg: search.msg });
-
+    const params: QueryDanmuParams = {
+        roomId,
+        page,
+        ...search,
+        startTime: range.value[0],
+        endTime: range.value[1]
+    }
     Api<{
         results: any[],
         page: number,
         count: number
-    }>(getDanmu({ id, page, uname: search.uname, msg: search.msg })).then(res => {
+    }>(queryDanmu(filterEmptyKey(params))).then(res => {
         if (res === false) return;
-        const results: Msg[] = res.data.results.map(item => ({ ...item, badge: check(item.badge), identityInfo: check(item.identityInfo) }))
-        data.value = results;
+        data.value = res.data.results;
         console.log(Math.floor(res.data.count / 100));
         pagination.pageCount = Math.floor(res.data.count / 100);
         pagination.count = res.data.count;
+        pagination.page = page;
     })
 }
 
