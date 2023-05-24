@@ -5,6 +5,9 @@
                 <n-input style="width: 200px;" placeholder="搜索用户名" v-model:value="search.uname" />
             </n-form-item>
             <n-form-item :show-label="false">
+                <n-input style="width: 200px;" placeholder="UID" v-model:value="search.uid" />
+            </n-form-item>
+            <n-form-item :show-label="false">
                 <n-input style="width: 200px;" placeholder="搜索弹幕" v-model:value="search.msg" />
             </n-form-item>
             <n-form-item :show-label="false">
@@ -74,6 +77,7 @@ const pagination = reactive({
 const search = reactive({
     uname: '',
     msg: '',
+    uid: ''
 });
 
 const range = ref([moment().subtract(1, 'months').valueOf(), Date.now()])
