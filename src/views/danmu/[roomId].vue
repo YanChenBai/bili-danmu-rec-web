@@ -18,8 +18,10 @@
         <div v-for="item in data" class="msg-card">
             <div class="top">
                 <div class="left">
-                    <Badge class="top-item" v-if="item.badge !== null" :badge="item.badge"></Badge>
-                    <template class="top-item" v-if="item.identityInfo !== null">
+                    <div class="top-item" v-if="item.badge !== null">
+                        <Badge class="top-item" :badge="item.badge"></Badge>
+                    </div>
+                    <template v-if="item.identityInfo !== null">
                         <RoomAdmin class="top-item" :is="item.identityInfo.room_admin"
                             v-if="item.identityInfo.room_admin" />
                         <Guard class="top-item" :level="item.identityInfo.guard_level"

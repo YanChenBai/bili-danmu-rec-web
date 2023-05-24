@@ -1,11 +1,17 @@
 <template>
     <Wrap>
-        <n-grid clos="12" x-gap="10" y-gap="10">
+        <n-grid cols="12" x-gap="10" y-gap="10">
             <n-gi v-for="item in data" span="4">
-                <n-card hoverable class="card" @click="goto(item.longId)">
-                    <img class="img" :src="`https://images.weserv.nl/?url=${item.face}`">
-                    <div><n-h3 style="margin-bottom: 0;">{{ item.name }}</n-h3></div>
-                    <div><n-text>房间ID {{ item.roomId }}</n-text></div>
+                <n-card hoverable class="card" content-style="padding: 10px" @click="goto(item.roomId)">
+                    <div class="box">
+                        <div class="face">
+                            <img :src="`https://images.weserv.nl/?url=${item.face}`">
+                        </div>
+                        <div class="info">
+                            <div><n-h3 style="margin-bottom: 0;">{{ item.name }}</n-h3></div>
+                            <div><n-text>房间ID #{{ item.roomId }}</n-text></div>
+                        </div>
+                    </div>
                 </n-card>
             </n-gi>
         </n-grid>
@@ -33,17 +39,21 @@ function goto(id: string) {
 </script>
 
 <style scoped lang="scss">
-.img {
-    width: 100%;
+.face img {
+    display: flex;
+    width: 100px;
     border-radius: 2px;
 }
 
-a {
-    text-decoration: underline;
+.card {
+    max-width: 400px;
+    cursor: pointer;
 }
 
-.card {
-    max-width: 200px;
-    cursor: pointer;
+.box {
+    display: flex;
+}
+.info {
+    margin-left: 10px;
 }
 </style>

@@ -2,7 +2,7 @@ import { AxiosRequestConfig } from 'axios';
 
 export const getUserList = (): AxiosRequestConfig => ({
   method: 'GET',
-  url: '/info/userList',
+  url: '/room/get',
 });
 
 export interface QueryDanmuParams {
