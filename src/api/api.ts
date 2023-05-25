@@ -2,7 +2,7 @@ import { message } from '@/utils/discrete';
 import Axios from 'axios';
 import type { AxiosRequestConfig } from 'axios';
 
-type Config = AxiosRequestConfig & {
+export type Config = AxiosRequestConfig & {
   successTips?: boolean;
   failureTips?: boolean;
 };
@@ -27,7 +27,6 @@ function Api<T = any>(config: Config): Promise<Respons<T> | false> {
         }
       })
       .catch((res) => {
-        console.log(res);
         if (config.failureTips) {
           if (res.response.data.message) {
             message.error(res.response.data.message);

@@ -1,5 +1,8 @@
 <template>
     <Wrap>
+        <n-space style="margin-bottom: 10px;">
+            <n-button type="primary" @click="showModal = true">添加直播间</n-button>
+        </n-space>
         <n-grid cols="12" x-gap="10" y-gap="10">
             <n-gi v-for="item in data" span="4">
                 <n-card hoverable class="card" content-style="padding: 10px" @click="goto(item.roomId)">
@@ -10,39 +13,78 @@
                         <div class="info">
                             <div><n-h3 style="margin-bottom: 0;">{{ item.name }}</n-h3></div>
                             <div><n-text>房间ID #{{ item.roomId }}</n-text></div>
+                            <div>
+                                今天弹幕：{{ count[item.roomId] ? count[item.roomId].count : '无' }}
+                            </div>
                         </div>
                     </div>
                 </n-card>
             </n-gi>
         </n-grid>
     </Wrap>
+
+    <n-modal v-model:show="showModal">
+        <n-card style="width: 600px" title="添加直播间" :bordered="false" role="dialog" aria-modal="true">
+            <template #header-extra>
+                不要加太多哦,会溢出来
+            </template>
+            <n-form-item label="直播间ID">
+                <n-input v-model:data="id" />
+            </n-form-item>
+            <template #footer>
+                <n-space justify="end">
+                    <n-button type="primary" @click="submit()">添加</n-button>
+                    <n-button @click="showModal = false">取消</n-button>
+                </n-space>
+            </template>
+        </n-card>
+    </n-modal>
 </template>
 <script setup lang="ts">
 import Wrap from '@/components/wrap.vue';
 import Api from '@/api/api';
-import { getUserList } from '@/api/info';
+import { addRoom, getUserList, todayDanmuCount } from '@/api/info';
+import { UserListRes, TodayDanmuCountRes } from '@/api/info';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 defineOptions({
     name: 'indexPage'
 });
 const router = useRouter();
-const data = ref<any>([]);
-Api<{ data: any }>(getUserList()).then(res => {
-    if (res === false) return;
-    data.value = res.data;
-})
+const data = ref<any>([]), showModal = ref<boolean>(false), id = ref<string>(''), count = ref<any>({});
+
+Promise.all([
+    Api<UserListRes[]>(getUserList()).then(res => {
+        if (res === false) return;
+        data.value = res.data;
+    }).catch(),
+    Api<TodayDanmuCountRes[]>(todayDanmuCount()).then(res => {
+        if (res === false) return;
+        const tmp = res.data.map(item => [item.roomId, item]);
+        count.value = Object.fromEntries(tmp);
+
+    }).catch(),
+]);
 
 function goto(id: string) {
     router.push('/danmu/' + id)
 }
+
+function submit() {
+    Api(addRoom(id.value))
+}
 </script>
 
 <style scoped lang="scss">
-.face img {
+.face {
     display: flex;
-    width: 100px;
-    border-radius: 2px;
+    width: 80px;
+    height: 80px;
+
+    img {
+        width: 100%;
+        border-radius: 2px;
+    }
 }
 
 .card {
@@ -52,7 +94,9 @@ function goto(id: string) {
 
 .box {
     display: flex;
+    align-items: center;
 }
+
 .info {
     margin-left: 10px;
 }
