@@ -5,6 +5,7 @@ import type { AxiosRequestConfig } from 'axios';
 export type Config = AxiosRequestConfig & {
   successTips?: boolean;
   failureTips?: boolean;
+  loading?: boolean
 };
 
 Axios.defaults.baseURL = 'http://localhost:3000';

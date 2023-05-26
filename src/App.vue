@@ -7,7 +7,9 @@
                 </div>
             </n-layout-header>
             <n-layout-content class="content">
-                <RouterView></RouterView>
+                <n-loading-bar-provider>
+                    <RouterView></RouterView>
+                </n-loading-bar-provider>
                 <div class="background"></div>
             </n-layout-content>
         </n-layout>
@@ -24,6 +26,18 @@ const menuOptions: MenuOption[] = [
             { default: () => '主页' }
         ),
         key: 'index'
+    },
+    {
+        label: () => h(RouterLink, { to: '/statistics' },
+            { default: () => '统计' }
+        ),
+        key: 'statistics'
+    },
+    {
+        label: () => h(RouterLink, { to: '/config' },
+            { default: () => '配置' }
+        ),
+        key: 'config'
     }
 ]
 </script>
@@ -41,7 +55,7 @@ const menuOptions: MenuOption[] = [
     width: 100vw;
     height: calc(100vh - 61px);
     overflow: hidden;
-    filter:alpha(opacity=60);
+    filter: alpha(opacity=60);
     background: url('@/assets/background2.png');
 }
 </style>

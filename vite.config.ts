@@ -9,6 +9,9 @@ import { NaiveUiResolver } from 'unplugin-vue-components/resolvers';
 import path from 'path';
 
 export default defineConfig({
+  server: {
+    port: 4554
+  },
   plugins: [
     DefineOptions(),
     VueRouter({

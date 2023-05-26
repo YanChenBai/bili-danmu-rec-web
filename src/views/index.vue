@@ -1,23 +1,34 @@
 <template>
     <Wrap>
-        <n-space style="margin-bottom: 10px;">
-            <n-button type="primary" @click="showModal = true">添加直播间</n-button>
-        </n-space>
         <n-grid cols="12" x-gap="10" y-gap="10">
             <n-gi v-for="item in data" span="4">
-                <n-card hoverable class="card" content-style="padding: 10px" @click="goto(item.roomId)">
+                <n-card hoverable class="card" content-style="padding: 10px" :bordered="false">
                     <div class="box">
-                        <div class="face">
-                            <img :src="`https://images.weserv.nl/?url=${item.face}`">
-                        </div>
-                        <div class="info">
-                            <div><n-h3 style="margin-bottom: 0;">{{ item.name }}</n-h3></div>
-                            <div><n-text>房间ID #{{ item.roomId }}</n-text></div>
-                            <div>
-                                今天弹幕：{{ count[item.roomId] ? count[item.roomId].count : '无' }}
+                        <div class="box-left">
+                            <div class="face">
+                                <img :src="`https://images.weserv.nl/?url=${item.face}`">
+                            </div>
+                            <div class="info">
+                                <div><n-h3 style="margin-bottom: 0;">{{ item.name }}</n-h3></div>
+                                <div><n-text>房间ID #{{ item.roomId }}</n-text></div>
+                                <div>
+                                    今天弹幕：{{ count[item.roomId] ? count[item.roomId].count : '无' }}
+                                </div>
                             </div>
                         </div>
+                        <div class="box-right">
+                            <n-space vertical align="end">
+                                <n-switch v-model:value="item.state"></n-switch>
+                                <RouterLink :to="`room/danmu/${item.roomId}`"><n-button strong secondary
+                                        type="primary">查看</n-button></RouterLink>
+                            </n-space>
+                        </div>
                     </div>
+                </n-card>
+            </n-gi>
+            <n-gi span="4">
+                <n-card hoverable class="card" content-style="padding: 10px" :bordered="false" @click="showModal = true">
+
                 </n-card>
             </n-gi>
         </n-grid>
@@ -29,7 +40,7 @@
                 不要加太多哦,会溢出来
             </template>
             <n-form-item label="直播间ID">
-                <n-input v-model:data="id" />
+                <n-input v-model:value="id" />
             </n-form-item>
             <template #footer>
                 <n-space justify="end">
@@ -46,11 +57,10 @@ import Api from '@/api/api';
 import { addRoom, getUserList, todayDanmuCount } from '@/api/info';
 import { UserListRes, TodayDanmuCountRes } from '@/api/info';
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
 defineOptions({
     name: 'indexPage'
 });
-const router = useRouter();
+
 const data = ref<any>([]), showModal = ref<boolean>(false), id = ref<string>(''), count = ref<any>({});
 
 Promise.all([
@@ -66,9 +76,6 @@ Promise.all([
     }).catch(),
 ]);
 
-function goto(id: string) {
-    router.push('/danmu/' + id)
-}
 
 function submit() {
     Api(addRoom(id.value))
@@ -89,10 +96,17 @@ function submit() {
 
 .card {
     max-width: 400px;
+    height: 100px;
     cursor: pointer;
 }
 
 .box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.box-left {
     display: flex;
     align-items: center;
 }

@@ -21,6 +21,7 @@ export interface QueryDanmuParams {
   msg?: string;
   endTime?: number;
   startTime?: number;
+  badgeIsRoom?: boolean;
 }
 
 export const queryDanmu = (params: QueryDanmuParams): Config => ({

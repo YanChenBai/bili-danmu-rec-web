@@ -1,12 +1,16 @@
 <template>
-    <div class="wrap">
-        <div class="wrap-box">
-            <slot></slot>
+    <n-spin :show=loading>
+        <div class="wrap">
+            <div class="wrap-box">
+                <slot></slot>
+            </div>
         </div>
-    </div>
+        <n-back-top :right="100" />
+    </n-spin>
 </template>
 <script setup lang="ts">
 defineOptions({ name: "Wrap" });
+const { loading } = defineProps<{ loading?: boolean }>()
 </script>
 <style scoped lang="scss">
 .wrap {
