@@ -9,6 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@antv/g-plugin-rough-canvas-renderer": "^1.7.52",
+    "@antv/g2": "^5.0.8",
     "@vueuse/core": "^10.1.2",
     "axios": "^0.27.2",
     "blive-message-listener": "^0.4.4",
@@ -20,18 +22,21 @@
     "unplugin-auto-import": "^0.15.2",
     "unplugin-vue-components": "^0.24.1",
     "vue": "^3.2.47",
-    "vue-router": "^4.1.6"
+    "vue-router": "^4.1.6",
+    "webfontloader": "^1.6.28"
   },
   "devDependencies": {
     "@types/node": "^18.15.0",
+    "@types/webfontloader": "^1.6.35",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
     "@vicons/tabler": "^0.12.0",
     "@vitejs/plugin-vue": "^4.1.0",
-    "@vue-macros/volar": "^0.9.5",
     "eslint": "^8.0.1",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
+    "prettier": "^2.3.2",
+    "tslib": "^2.5.2",
     "typescript": "^5.0.2",
     "unplugin-vue-define-options": "^1.2.3",
     "unplugin-vue-macros": "^1.9.1",
